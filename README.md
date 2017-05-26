@@ -1,4 +1,8 @@
-Eclipse project for android to use USB Webcam.
+The project forks of https://bitbucket.org/droidperception/simplewebcam.
+
+The project supports for usb camera preview on android platform.
+
+The project supports mjpeg format of preview frame.
 
 To run this application, the following conditions should be satisfied.
 
