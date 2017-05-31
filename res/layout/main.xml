@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
+	android:gravity="center_horizontal">
 	<com.camera.simplewebcam.CameraPreview
 		android:id="@+id/cp"
 		android:layout_width="fill_parent"
-		android:layout_height="0dip"
-		android:layout_weight="1"
+		android:layout_height="fill_parent"
 		/>
-</LinearLayout>
+
+	<ImageButton
+		android:id="@+id/capture_button"
+		android:layout_width="88dp"
+		android:layout_height="88dp"
+		android:background="@drawable/bg_select"
+		android:layout_alignParentBottom="true"
+		android:layout_centerHorizontal="true" />
+</RelativeLayout>

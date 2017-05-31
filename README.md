@@ -1,6 +1,6 @@
 The project forks of https://bitbucket.org/droidperception/simplewebcam.
 
-The project supports for usb camera preview on android platform.
+The project supports for usb camera preview and capture on android platform.
 
 The project supports mjpeg format of preview frame.
 

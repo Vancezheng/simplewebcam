@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.ImageButton;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,6 +26,8 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
 
 	private boolean cameraExists=false;
 	private boolean shouldStop=false;
+    private boolean captureFinished;
+    private Object mCaptureSync = new Object();
 	
 	// /dev/videox (x=cameraId+cameraBase) is used.
 	// In some omap devices, system uses /dev/video[0-3],
@@ -97,12 +100,16 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
                 }
 
         	}
-        	// obtaining a camera image (pixel data are stored in an array in JNI).
-        	byte[] framebuffer = processCamera();
-        	// camera image to bmp
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inSampleSize = 1;
-			bmp = BitmapFactory.decodeByteArray(framebuffer, 0, framebuffer.length, options);
+            synchronized (mCaptureSync) {
+                // obtaining a camera image (pixel data are stored in an array in JNI).
+                byte[] framebuffer = processCamera();
+                // camera image to bmp
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 1;
+                bmp = BitmapFactory.decodeByteArray(framebuffer, 0, framebuffer.length, options);
+                captureFinished = true;
+                mCaptureSync.notify();
+            }
 
         	//pixeltobmp(bmp);
 
@@ -170,6 +177,20 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
             cameraExists = false;
             stopCamera();
             powerOnOffCamera(0);
+        }
+    }
+
+    public Bitmap captureImage(){
+        synchronized (mCaptureSync) {
+            try {
+                while (!captureFinished) {
+                    mCaptureSync.wait();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            captureFinished = false;
+            return bmp;
         }
     }
 }
