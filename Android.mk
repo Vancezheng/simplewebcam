@@ -10,3 +10,5 @@ LOCAL_PACKAGE_NAME := simplewebcam
 LOCAL_CERTIFICATE := platform
 
 include $(BUILD_PACKAGE)
+
+include $(call all-makefiles-under,$(LOCAL_PATH))
