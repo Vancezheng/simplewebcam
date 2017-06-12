@@ -47,6 +47,8 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
     private Rect rect;
     private int dw, dh;
     private float rate;
+    private PreviewStartCallback psCallback;
+    private boolean isPreviewStart;
   
     // JNI functions
     public native int powerOnOffCamera(int power);
@@ -65,7 +67,6 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
 		
 		holder = getHolder();
 		holder.addCallback(this);
-		holder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
 	}
 
 	public CameraPreview(Context context, AttributeSet attrs) {
@@ -76,7 +77,6 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
 		
 		holder = getHolder();
 		holder.addCallback(this);
-		holder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);	
 	}
 	
     @Override
@@ -121,6 +121,10 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
 
 					getHolder().unlockCanvasAndPost(canvas);
 				}
+                if (!isPreviewStart) {
+                    psCallback.onPreviewStart();
+                    isPreviewStart = true;
+                }
 			}
 
             if(shouldStop){
@@ -192,5 +196,13 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
             captureFinished = false;
             return bmp;
         }
+    }
+
+    public void setCallBack(PreviewStartCallback previewStartCallback){
+        psCallback = previewStartCallback;
+    }
+
+    public interface PreviewStartCallback {
+        void onPreviewStart();
     }
 }

@@ -691,18 +691,18 @@ jint
 Java_com_camera_simplewebcam_CameraPreview_prepareCamera( JNIEnv* env,jobject thiz, jint videoid){
 
 	int ret;
+    int i;
 
 	if(camerabase<0){
 		camerabase = checkCamerabase();
 	}
 
-    while(1) {
+    for (i = 0; i < 50; i++){
         ret = opendevice(camerabase + videoid);
         if (ret == SUCCESS_LOCAL) {
             break;
         }
         usleep(100000);
-        LOGI("sleep 100ms");
     }
 
 	if(ret != ERROR_LOCAL){

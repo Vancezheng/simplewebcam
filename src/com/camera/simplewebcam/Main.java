@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,13 +23,14 @@ import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-public class Main extends Activity {
+public class Main extends Activity implements CameraPreview.PreviewStartCallback{
     private static final boolean DEBUG = true;
     private static final String TAG="WebCam";
     public static final String KEY_CAPTURE_URI = "capture_uri";
     private static final SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US);
 
-	CameraPreview cp;
+    private LinearLayout loading_container;
+    private CameraPreview cp;
     private ImageButton captureButton;
     private SoundPool mSoundPool;
     private int mSoundId;
@@ -44,50 +46,29 @@ public class Main extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+        loading_container= (LinearLayout) findViewById(R.id.loading_container);
+        loading_container.setVisibility(View.VISIBLE);
 		cp = (CameraPreview) findViewById(R.id.cp);
+        cp.setCallBack(this);
         captureButton = (ImageButton) findViewById(R.id.capture_button);
+        captureButton.setEnabled(false);
 
         loadShutterSound(getApplicationContext());
         captureButton.setOnClickListener(mOnClickListener);
 	}
 
-	@Override
-	protected void onStart() {
-        if (DEBUG) Log.d(TAG, "onStart");
-		super.onStart();
-		cp.openCamera();
-	}
+    @Override
+    public void onPreviewStart() {
+        Log.d(TAG, "onPreviewStart");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loading_container.setVisibility(View.GONE);
+                captureButton.setEnabled(true);
+            }
+        });
+    }
 
-	@Override
-	protected void onRestart() {
-        if (DEBUG) Log.d(TAG, "onRestart");
-		super.onRestart();
-	}
-
-	@Override
-	protected void onResume() {
-		Log.d(TAG, "onResume");
-		super.onResume();
-	}
-
-	@Override
-	protected void onPause() {
-        if (DEBUG) Log.d(TAG, "onPause");
-		super.onPause();
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-        if (DEBUG) Log.d(TAG, "onStop");
-		cp.quitCamera();
-	}
-
-	@Override
-	protected void onDestroy() {
-        if (DEBUG) Log.d(TAG, "onDestroy");
-		super.onDestroy();
-	}
 
     private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -158,7 +139,13 @@ public class Main extends Activity {
         if(MediaStore.ACTION_IMAGE_CAPTURE.equals(getIntent().getAction())
                 || MediaStore.ACTION_IMAGE_CAPTURE_SECURE.equals(getIntent().getAction())){
             mSaveUri = getIntent().getParcelableExtra(MediaStore.EXTRA_OUTPUT);
-            if (DEBUG) Log.v(TAG, "isCaptureIntent: mSaveUri=" + mSaveUri.toString());
+            if (DEBUG) {
+                if (mSaveUri != null) {
+                    Log.v(TAG, "isCaptureIntent: mSaveUri=" + mSaveUri.toString());
+                } else {
+                    Log.v(TAG, "isCaptureIntent: mSaveUri=null");
+                }
+            }
             return true;
         }else {
             mSaveUri = null;
