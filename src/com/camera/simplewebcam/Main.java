@@ -36,6 +36,7 @@ public class Main extends Activity implements CameraPreview.PreviewStartCallback
     private int mSoundId;
 
     private Uri mSaveUri;
+    private boolean mIsCaptureIntent;
 
 	static {
 		Log.d(TAG, "loadLibrary");
@@ -58,6 +59,44 @@ public class Main extends Activity implements CameraPreview.PreviewStartCallback
 	}
 
     @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart");
+        super.onStart();
+        cp.openCamera();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d(TAG, "onRestart");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause");
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop");
+        super.onStop();
+        cp.quitCamera();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
     public void onPreviewStart() {
         Log.d(TAG, "onPreviewStart");
         runOnUiThread(new Runnable() {
@@ -74,7 +113,8 @@ public class Main extends Activity implements CameraPreview.PreviewStartCallback
         @Override
         public void onClick(View v) {
             mSoundPool.play(mSoundId, 1.0f, 1.0f, 0, 0, 1.0f);
-            if (isCaptureIntent() && mSaveUri != null) {
+            mIsCaptureIntent = isCaptureIntent();
+            if (mIsCaptureIntent && mSaveUri != null) {
                 String path = mSaveUri.getPath();//Uri.parse(mSaveUri.toString()).getPath();
                 if (DEBUG) Log.v(TAG, "filePath=" + path);
                 boolean isSuccess = saveCaptureFile(path);
@@ -155,7 +195,8 @@ public class Main extends Activity implements CameraPreview.PreviewStartCallback
 
     private void exitActivity(boolean isSuccess) {
         if (DEBUG) Log.v(TAG, "exitActivity isSuccess=" + isSuccess);
-        if (isCaptureIntent() && mSaveUri != null) {
+        captureButton.setEnabled(false);
+        if (mIsCaptureIntent && mSaveUri != null) {
             Intent intent = new Intent();
             intent.putExtra(KEY_CAPTURE_URI, mSaveUri);
             if (isSuccess) {

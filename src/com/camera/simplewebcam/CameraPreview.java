@@ -37,7 +37,6 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
 	private int cameraBase=0;
 	
 	// This definition also exists in ImageProc.h.
-	// Webcam must support the resolution 640x480 with YUYV format.
 	static final int IMG_WIDTH=1280;
 	static final int IMG_HEIGHT=720;
 
@@ -137,8 +136,8 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		if(DEBUG) Log.d(TAG, "surfaceCreated");
-        openCamera();
-	}
+//        openCamera();
+    }
 
     public void openCamera() {
         if(!cameraExists) {
@@ -166,7 +165,7 @@ class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Runna
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		if(DEBUG) Log.d(TAG, "surfaceDestroyed");
-        quitCamera();
+//        quitCamera();
 	}
 
     public void quitCamera(){
